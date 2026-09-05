@@ -1,16 +1,17 @@
 # visual-watchdog
 
-Screenshot a set of web pages on a schedule, compare each against an approved
-baseline, and get a visual report of anything that actually changed — without
-drowning in false alarms from animations, web fonts, or content that shifts a
-few pixels.
+A student tool for pages that change without telling you: the course board,
+the exam timetable, registration, office hours. Point it at those URLs, and it
+screenshots them on a schedule and shows you *what actually moved* — so a
+quiet edit to the midterm room does not get lost in a carousel or a “2 minutes
+ago” timestamp.
 
 ![A rendered diff: unchanged content is greyed out, the five changed elements
 are boxed in red, and a known-dynamic banner is masked out entirely](assets/demo-diff.png)
 
-*Baseline vs. a change a designer might ship. The four card headings and the
-button were recoloured; the watchdog greys out everything untouched, boxes the
-five real changes, and ignores the masked banner (the grey bar) completely.*
+*A course-board edit: headings and the registration button changed colour.
+Unchanged content is greyed out, the real edits are boxed, and the live seat
+counter (the grey bar) is masked so it never counts as a change.*
 
 ## Why this is harder than "diff two PNGs"
 
@@ -94,8 +95,10 @@ onion-skin slider that blends between baseline and current.
 
 ## Configuring targets
 
-`targets.yaml` lists the pages to watch. Anything under `defaults` applies to
-every page unless that page overrides it.
+`targets.yaml` lists the pages to watch — your course board, exam timetable,
+registration page. The bundled examples are public course-reading pages so the
+repo runs without a campus login. Swap them for your faculty URLs. Anything
+under `defaults` applies to every page unless that page overrides it.
 
 ```yaml
 defaults:
@@ -168,8 +171,8 @@ python -m vwatch -c demo.yaml compare
 ```
 
 `--inject-css` restyles the page at capture time without touching the fixture,
-which is also a handy way to see what a real change would look like in the
-report before it ships.
+which is how you preview “the registrar recoloured the register button” before
+it happens on a live page.
 
 ## Continuous integration
 
@@ -212,8 +215,9 @@ workflow are pinned together — bump them in lockstep.
 
 ## Limitations and future work
 
-- **Authenticated pages** aren't supported yet; every target is fetched
-  anonymously. A stored-session option is the obvious next step.
+- **Campus logins (LMS, student portal)** aren't supported yet; every target is
+  fetched anonymously. A stored-session option is the next step for Moodle /
+  Google Classroom / registrar pages behind SSO.
 - **Page discovery is manual** — you list URLs. Crawling a site to find pages
   automatically would scale it up.
 - **No history** — each run compares against one baseline. Keeping a timeline of

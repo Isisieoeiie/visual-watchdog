@@ -1,9 +1,8 @@
-# Pages to watch. Anything under `defaults` applies to every page unless the
-# page overrides it.
+# Pages a student would actually watch. Replace these with your faculty
+# announcement board, exam timetable, or registration page.
 #
-# These targets are deliberately low-noise: no ads, no rotating banners, no
-# personalisation. Add a news or e-commerce homepage and expect to spend your
-# time writing mask selectors instead.
+# Start with public, low-noise pages. A login-gated LMS is future work.
+# A news homepage or campus Facebook embed will need mask selectors.
 
 defaults:
   viewports:

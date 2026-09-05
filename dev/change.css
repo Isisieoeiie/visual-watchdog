@@ -1,4 +1,4 @@
-/* A change a designer might ship: restyle the primary button and the card
+/* A course-page edit: restyle the registration button and the notice
    headings. Applied at capture time via --inject-css so the fixture file
    itself stays untouched and the demo stays reproducible. */
 .cta {

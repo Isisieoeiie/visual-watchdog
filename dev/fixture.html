@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>vwatch fixture</title>
+<title>CS101 course board</title>
 <style>
   * { box-sizing: border-box; }
   body {
@@ -43,23 +43,23 @@
 <body>
 <div class="page">
   <header>
-    <h1>Fixture page</h1>
-    <p class="lede">A deterministic page used to smoke-test the capture pipeline.</p>
+    <h1>CS101 course board</h1>
+    <p class="lede">Deadlines and notices for this week. Watch this page so a silent edit does not cost you a midterm seat.</p>
   </header>
 
   <div class="fade">
     <div class="cards">
-      <div class="card"><h2>Masking</h2><p>The banner below is masked by selector.</p></div>
-      <div class="card"><h2>Freezing</h2><p>The clock and RNG are pinned before page scripts run.</p></div>
-      <div class="card"><h2>Animation</h2><p>This block fades in and must land fully opaque.</p></div>
-      <div class="card"><h2>Lazy load</h2><p>Off-screen images are forced to decode.</p></div>
+      <div class="card"><h2>Midterm</h2><p>Friday 09:00, room B204. Bring student ID.</p></div>
+      <div class="card"><h2>Assignment 3</h2><p>Due Sunday 23:59 on the LMS. Late work is not accepted.</p></div>
+      <div class="card"><h2>Office hours</h2><p>Tue / Thu 13:00–15:00. The queue is first-come.</p></div>
+      <div class="card"><h2>Lab</h2><p>Bring your laptop. Partner list is posted on the door.</p></div>
     </div>
   </div>
 
-  <a class="cta" href="#">Primary action</a>
+  <a class="cta" href="#">Open registration</a>
 
   <div class="banner" id="volatile">
-    Volatile row — masked in <code>local.yaml</code>: <span id="ticket"></span>
+    Live seat count — masked so a ticking number is not a false alarm: <span id="ticket"></span>
   </div>
 
   <footer>

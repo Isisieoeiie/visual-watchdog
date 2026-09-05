@@ -4,7 +4,7 @@
 #   python -m http.server 8931 --bind 127.0.0.1 --directory dev
 #   python -m vwatch -c demo.yaml capture
 #   python -m vwatch -c demo.yaml approve
-#   # simulate a change a designer might ship, without editing the page:
+#   # simulate a course-page edit (button + headings) without touching the file:
 #   python -m vwatch -c demo.yaml capture --inject-css "@dev/change.css"
 #   python -m vwatch -c demo.yaml compare
 #   python -m vwatch -c demo.yaml publish
