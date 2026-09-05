@@ -1,0 +1,26 @@
+# Config for the README/Pages showcase. It points at the bundled fixture page
+# (dev/fixture.html) so the demo diff is fully reproducible by anyone:
+#
+#   python -m http.server 8931 --bind 127.0.0.1 --directory dev
+#   python -m vwatch -c demo.yaml capture
+#   python -m vwatch -c demo.yaml approve
+#   # simulate a change a designer might ship, without editing the page:
+#   python -m vwatch -c demo.yaml capture --inject-css "@dev/change.css"
+#   python -m vwatch -c demo.yaml compare
+#   python -m vwatch -c demo.yaml publish
+
+defaults:
+  viewports:
+    - name: desktop
+      width: 1280
+      height: 800
+      mobile: false
+  full_page: true
+  threshold: 0.995
+  settle_ms: 200
+
+pages:
+  - name: fixture
+    url: http://127.0.0.1:8931/fixture.html
+    mask:
+      - "#volatile"

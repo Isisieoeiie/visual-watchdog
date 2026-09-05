@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+*.pyc
+
+# Fresh captures and the generated report are rebuilt on every run.
+snapshots/
+report/
+
+# Throwaway baselines from the dev/local.yaml smoke test.
+dev/baselines/
+
+# baselines/ and docs/ are committed on purpose: baselines are the reference
+# images that reviewers diff in a pull request, docs/ is what Pages serves.

@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>vwatch fixture</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 2rem 1.5rem 4rem; background: #f6f7f9; color: #14181f;
+    font: 16px/1.6 ui-sans-serif, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  .page { max-width: 960px; margin: 0 auto; }
+  h1 { margin: 0 0 .35rem; font-size: 2rem; letter-spacing: -.02em; }
+  .lede { margin: 0 0 2rem; color: #55606f; }
+
+  /* Fades in from invisible: `animation: none` would leave it blank, so the
+     capture layer must drive it to the final frame instead. */
+  .fade { animation: rise 1200ms ease-out both; }
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; }
+  .card { background: #fff; border: 1px solid #e2e5ea; border-radius: 12px; padding: 1.1rem; }
+  .card h2 { margin: 0 0 .4rem; font-size: 1.0625rem; }
+  .card p { margin: 0; color: #55606f; font-size: .9375rem; }
+
+  .cta {
+    display: inline-block; margin: 2rem 0 0; padding: .7rem 1.4rem; border-radius: 8px;
+    background: #1f6feb; color: #fff; font-weight: 600; text-decoration: none;
+  }
+  .banner {
+    margin: 2rem 0 0; padding: .9rem 1.1rem; border-radius: 10px;
+    background: #fff4d6; border: 1px solid #f0d9a0; font-size: .9375rem;
+  }
+  footer { margin-top: 2.5rem; padding-top: 1.25rem; border-top: 1px solid #e2e5ea;
+           color: #6b7684; font-size: .8125rem; }
+  code { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; }
+</style>
+</head>
+<body>
+<div class="page">
+  <header>
+    <h1>Fixture page</h1>
+    <p class="lede">A deterministic page used to smoke-test the capture pipeline.</p>
+  </header>
+
+  <div class="fade">
+    <div class="cards">
+      <div class="card"><h2>Masking</h2><p>The banner below is masked by selector.</p></div>
+      <div class="card"><h2>Freezing</h2><p>The clock and RNG are pinned before page scripts run.</p></div>
+      <div class="card"><h2>Animation</h2><p>This block fades in and must land fully opaque.</p></div>
+      <div class="card"><h2>Lazy load</h2><p>Off-screen images are forced to decode.</p></div>
+    </div>
+  </div>
+
+  <a class="cta" href="#">Primary action</a>
+
+  <div class="banner" id="volatile">
+    Volatile row — masked in <code>local.yaml</code>: <span id="ticket"></span>
+  </div>
+
+  <footer>
+    Rendered at <span id="now">…</span> &middot; seed <span id="rand">…</span>
+  </footer>
+</div>
+
+<script>
+  // If the capture layer works, these three read identically on every run.
+  document.getElementById('now').textContent = new Date().toISOString();
+  document.getElementById('rand').textContent = Math.random().toFixed(9);
+  document.getElementById('ticket').textContent = '#' + Math.floor(Math.random() * 1e9);
+</script>
+</body>
+</html>

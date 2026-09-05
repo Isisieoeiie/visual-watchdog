@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Visual watchdog report</title>
+<style>
+  :root {
+    --bg: #0e1116;
+    --card: #161b22;
+    --line: #262d36;
+    --text: #e6edf3;
+    --dim: #8b949e;
+    --pass: #3fb950;
+    --shifted: #d29922;
+    --changed: #f85149;
+    --new: #58a6ff;
+    --error: #bc8cff;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 2rem 1.25rem 4rem;
+    background: var(--bg);
+    color: var(--text);
+    font: 15px/1.55 ui-sans-serif, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  .wrap { max-width: 1180px; margin: 0 auto; }
+  h1 { margin: 0 0 .25rem; font-size: 1.5rem; letter-spacing: -.01em; }
+  .meta { margin: 0 0 1.25rem; color: var(--dim); font-size: .875rem; }
+  .tally { display: flex; flex-wrap: wrap; gap: .5rem; padding: 0; margin: 0 0 2rem; list-style: none; }
+  .tally li {
+    padding: .3rem .7rem; border: 1px solid var(--line); border-radius: 999px;
+    font-size: .8125rem; color: var(--dim);
+  }
+  .tally li b { color: var(--text); font-weight: 600; }
+  .tally li.on { border-color: currentColor; }
+  .tally .k-unchanged.on { color: var(--pass); }
+  .tally .k-shifted.on { color: var(--shifted); }
+  .tally .k-changed.on { color: var(--changed); }
+  .tally .k-new.on { color: var(--new); }
+  .tally .k-error.on { color: var(--error); }
+
+  .card {
+    border: 1px solid var(--line); border-radius: 12px; background: var(--card);
+    padding: 1.25rem; margin-bottom: 1.5rem;
+  }
+  .card header { display: flex; align-items: baseline; gap: .6rem; flex-wrap: wrap; }
+  .card h2 { margin: 0; font-size: 1.0625rem; font-weight: 600; }
+  .vp {
+    font-size: .75rem; color: var(--dim); border: 1px solid var(--line);
+    border-radius: 5px; padding: .1rem .4rem;
+  }
+  .badge {
+    margin-left: auto; font-size: .75rem; font-weight: 600; text-transform: uppercase;
+    letter-spacing: .04em; padding: .2rem .55rem; border-radius: 5px; color: #0e1116;
+  }
+  .status-pass .badge { background: var(--pass); }
+  .status-shifted .badge { background: var(--shifted); }
+  .status-changed .badge { background: var(--changed); }
+  .status-new .badge { background: var(--new); }
+  .status-error .badge { background: var(--error); }
+
+  .url { margin: .35rem 0 .9rem; font-size: .8125rem; }
+  .url a { color: var(--dim); text-decoration: none; }
+  .url a:hover { color: var(--new); text-decoration: underline; }
+
+  .stats { display: flex; flex-wrap: wrap; gap: 1.5rem; margin: 0 0 .75rem; }
+  .stats div { display: flex; flex-direction: column; }
+  .stats dt { font-size: .6875rem; text-transform: uppercase; letter-spacing: .05em; color: var(--dim); }
+  .stats dd { margin: .1rem 0 0; font-variant-numeric: tabular-nums; font-weight: 600; }
+  .note { margin: 0 0 1rem; font-size: .8125rem; color: var(--shifted); }
+
+  .frames { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: .9rem; }
+  figure { margin: 0; }
+  figcaption { font-size: .6875rem; text-transform: uppercase; letter-spacing: .05em; color: var(--dim); margin-bottom: .35rem; }
+  .frames a { display: block; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; max-height: 340px; }
+  .frames img { display: block; width: 100%; }
+
+  .onion { margin-top: 1.1rem; }
+  .onion-label { display: flex; justify-content: space-between; font-size: .6875rem; text-transform: uppercase; letter-spacing: .05em; color: var(--dim); margin-bottom: .35rem; }
+  .stack { position: relative; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; max-height: 520px; }
+  .stack img { display: block; width: 100%; }
+  .stack .over { position: absolute; top: 0; left: 0; }
+  input[type=range] { width: 100%; margin-top: .6rem; accent-color: var(--new); }
+  .empty { color: var(--dim); font-size: .875rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Visual watchdog</h1>
+  <p class="meta">
+    {{ generated_at }} &middot; {{ total }} comparison{{ '' if total == 1 else 's' }}
+    {% if failures %}&middot; {{ failures }} needing attention{% else %}&middot; all clear{% endif %}
+  </p>
+
+  <ul class="tally">
+    <li class="k-unchanged{{ ' on' if counts.unchanged }}"><b>{{ counts.unchanged }}</b> unchanged</li>
+    <li class="k-shifted{{ ' on' if counts.shifted }}"><b>{{ counts.shifted }}</b> shifted</li>
+    <li class="k-changed{{ ' on' if counts.changed }}"><b>{{ counts.changed }}</b> changed</li>
+    <li class="k-new{{ ' on' if counts.new }}"><b>{{ counts.new }}</b> new</li>
+    <li class="k-error{{ ' on' if counts.error }}"><b>{{ counts.error }}</b> error</li>
+  </ul>
+
+  {% for entry in entries %}
+  <section class="card status-{{ entry.status }}">
+    <header>
+      <h2>{{ entry.page }}</h2>
+      <span class="vp">{{ entry.viewport }}</span>
+      <span class="badge">{{ entry.status }}</span>
+    </header>
+    <p class="url"><a href="{{ entry.url }}" target="_blank" rel="noreferrer">{{ entry.url }}</a></p>
+
+    <dl class="stats">
+      <div><dt>SSIM</dt><dd>{{ '%.4f'|format(entry.score) }}</dd></div>
+      <div><dt>Changed area</dt><dd>{{ '%.2f'|format(entry.changed_percent) }}%</dd></div>
+      <div><dt>Vertical shift</dt><dd>{{ entry.shift }} px</dd></div>
+      <div><dt>Height delta</dt><dd>{{ entry.height_delta }} px</dd></div>
+      <div><dt>Regions</dt><dd>{{ entry.region_count }}</dd></div>
+    </dl>
+    {% if entry.note %}
+    <p class="note">{{ entry.note }}</p>
+    {% endif %}
+
+    {% if entry.baseline or entry.current %}
+    <div class="frames">
+      {% if entry.baseline %}
+      <figure>
+        <figcaption>Baseline</figcaption>
+        <a href="{{ entry.baseline }}" target="_blank"><img src="{{ entry.baseline }}" alt="baseline"></a>
+      </figure>
+      {% endif %}
+      {% if entry.current %}
+      <figure>
+        <figcaption>Current</figcaption>
+        <a href="{{ entry.current }}" target="_blank"><img src="{{ entry.current }}" alt="current"></a>
+      </figure>
+      {% endif %}
+      {% if entry.diff %}
+      <figure>
+        <figcaption>Difference</figcaption>
+        <a href="{{ entry.diff }}" target="_blank"><img src="{{ entry.diff }}" alt="difference"></a>
+      </figure>
+      {% endif %}
+    </div>
+    {% else %}
+    <p class="empty">No images captured for this target.</p>
+    {% endif %}
+
+    {% if entry.baseline and entry.current %}
+    <div class="onion" data-onion>
+      <div class="onion-label"><span>Baseline</span><span>Current</span></div>
+      <div class="stack">
+        <img src="{{ entry.baseline }}" alt="baseline layer">
+        <img class="over" src="{{ entry.current }}" alt="current layer">
+      </div>
+      <input type="range" min="0" max="100" value="100" aria-label="Blend between baseline and current">
+    </div>
+    {% endif %}
+  </section>
+  {% endfor %}
+</div>
+
+<script>
+  for (const box of document.querySelectorAll('[data-onion]')) {
+    const slider = box.querySelector('input[type=range]');
+    const overlay = box.querySelector('.over');
+    const apply = () => { overlay.style.opacity = String(slider.value / 100); };
+    slider.addEventListener('input', apply);
+    apply();
+  }
+</script>
+</body>
+</html>

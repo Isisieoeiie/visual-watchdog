@@ -1,0 +1,9 @@
+/* A change a designer might ship: restyle the primary button and the card
+   headings. Applied at capture time via --inject-css so the fixture file
+   itself stays untouched and the demo stays reproducible. */
+.cta {
+  background: #b91c1c !important;
+}
+.card h2 {
+  color: #b91c1c !important;
+}

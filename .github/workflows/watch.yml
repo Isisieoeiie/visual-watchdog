@@ -1,0 +1,176 @@
+name: visual-watchdog
+
+# Three jobs:
+#   selftest  — required on every PR. Hits the bundled fixture, so it does not
+#               depend on committed baselines matching this machine's renderer.
+#   watch     — screenshots the live pages in targets.yaml, comments on the PR,
+#               and on the nightly cron opens/updates a drift issue.
+#   approve   — manual: capture baselines inside this container and commit them.
+#               Do this once so `watch` compares like-for-like.
+
+on:
+  schedule:
+    - cron: "0 7 * * *" # 07:00 UTC nightly
+  pull_request:
+    paths:
+      - "vwatch/**"
+      - "templates/**"
+      - "targets.yaml"
+      - "demo.yaml"
+      - "dev/**"
+      - "baselines/**"
+      - "requirements.txt"
+      - ".github/workflows/watch.yml"
+  workflow_dispatch:
+    inputs:
+      approve:
+        description: "Capture fresh baselines in the CI environment and commit them"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: visual-watchdog-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "1"
+
+jobs:
+  selftest:
+    if: ${{ !(github.event_name == 'workflow_dispatch' && inputs.approve) }}
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright/python:v1.62.0-jammy
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install --no-cache-dir -r requirements.txt
+      - name: Run engine self-test
+        run: python -m vwatch selftest
+
+  approve:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.approve }}
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright/python:v1.62.0-jammy
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install --no-cache-dir -r requirements.txt
+      - name: Capture and approve baselines
+        run: |
+          python -m vwatch capture
+          python -m vwatch approve
+      - name: Commit baselines
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add baselines
+          git commit -m "Refresh visual baselines (CI environment)" || {
+            echo "No baseline changes to commit."
+            exit 0
+          }
+          git push
+
+  watch:
+    if: ${{ !(github.event_name == 'workflow_dispatch' && inputs.approve) }}
+    needs: selftest
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright/python:v1.62.0-jammy
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install --no-cache-dir -r requirements.txt
+
+      - name: Run watchdog
+        id: watch
+        run: |
+          set +e
+          python -m vwatch run
+          echo "exit_code=$?" >> "$GITHUB_OUTPUT"
+
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-report
+          path: report/
+          if-no-files-found: warn
+
+      - name: Comment on the pull request
+        if: ${{ always() && github.event_name == 'pull_request' }}
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const marker = '<!-- visual-watchdog -->';
+            let body = 'The watchdog produced no summary.';
+            try { body = fs.readFileSync('report/summary.md', 'utf8'); } catch (e) {}
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            body = `${marker}\n${body}\n\n_Full report is attached as the \`visual-report\` artifact on [this run](${runUrl})._`;
+            const { owner, repo } = context.repo;
+            const issue_number = context.issue.number;
+            const { data: comments } = await github.rest.issues.listComments({ owner, repo, issue_number });
+            const existing = comments.find(c => c.body && c.body.includes(marker));
+            if (existing) {
+              await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body });
+            } else {
+              await github.rest.issues.createComment({ owner, repo, issue_number, body });
+            }
+
+      - name: Open or update a nightly drift issue
+        if: ${{ always() && github.event_name == 'schedule' && steps.watch.outputs.exit_code == '1' }}
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const { owner, repo } = context.repo;
+            let body = 'The nightly visual check found changes.';
+            try { body = fs.readFileSync('report/summary.md', 'utf8'); } catch (e) {}
+            const runUrl = `${context.serverUrl}/${owner}/${repo}/actions/runs/${context.runId}`;
+            const today = new Date().toISOString().slice(0, 10);
+            body += `\n\n_See the \`visual-report\` artifact on [this run](${runUrl})._`;
+
+            const label = 'visual-regression';
+            try {
+              await github.rest.issues.getLabel({ owner, repo, name: label });
+            } catch (e) {
+              await github.rest.issues.createLabel({
+                owner, repo, name: label, color: 'f85149',
+                description: 'Nightly visual-watchdog found a change',
+              });
+            }
+
+            const { data: open } = await github.rest.issues.listForRepo({
+              owner, repo, state: 'open', labels: label, per_page: 20,
+            });
+            const existing = open.find(i => i.title.startsWith('Visual changes detected'));
+            if (existing) {
+              await github.rest.issues.update({
+                owner, repo, issue_number: existing.number,
+                title: `Visual changes detected — ${today}`,
+                body,
+              });
+            } else {
+              await github.rest.issues.create({
+                owner, repo,
+                title: `Visual changes detected — ${today}`,
+                body,
+                labels: [label],
+              });
+            }
+
+      - name: Fail if changes or errors were found
+        if: ${{ steps.watch.outputs.exit_code != '0' }}
+        run: |
+          echo "vwatch exited ${{ steps.watch.outputs.exit_code }} — see the job summary and the visual-report artifact."
+          echo "If every page is CHANGED on a first CI run, seed Linux baselines: Actions → Run workflow → tick approve."
+          exit 1

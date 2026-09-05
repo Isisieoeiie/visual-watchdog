@@ -1,0 +1,24 @@
+# Smoke-test config. Serve this folder first:
+#   python -m http.server 8931 --directory dev
+# then run vwatch against it:
+#   python -m vwatch -c dev/local.yaml run
+
+defaults:
+  viewports:
+    - name: mobile
+      width: 390
+      height: 844
+      mobile: true
+    - name: desktop
+      width: 1280
+      height: 800
+      mobile: false
+  full_page: true
+  threshold: 0.995
+  settle_ms: 200
+
+pages:
+  - name: fixture
+    url: http://localhost:8931/fixture.html
+    mask:
+      - "#volatile"

@@ -1,0 +1,43 @@
+# Pages to watch. Anything under `defaults` applies to every page unless the
+# page overrides it.
+#
+# These targets are deliberately low-noise: no ads, no rotating banners, no
+# personalisation. Add a news or e-commerce homepage and expect to spend your
+# time writing mask selectors instead.
+
+defaults:
+  viewports:
+    - name: mobile
+      width: 390
+      height: 844
+      mobile: true
+    - name: desktop
+      width: 1440
+      height: 900
+      mobile: false
+  full_page: true
+  # Minimum SSIM score for a page to count as unchanged. 0.995 is strict enough
+  # to catch a changed button colour and loose enough to ignore font rendering.
+  threshold: 0.995
+  # A region counts as different where local SSIM drops below this.
+  local_threshold: 0.85
+  # Ignore changed blobs smaller than this many pixels; kills anti-aliasing noise.
+  min_region: 120
+  settle_ms: 400
+
+pages:
+  - name: example
+    url: https://example.com
+
+  - name: python-pathlib
+    url: https://docs.python.org/3/library/pathlib.html
+
+  - name: wikipedia-python
+    url: https://en.wikipedia.org/wiki/Python_(programming_language)
+    mask:
+      # Edit timestamp in the footer, and the fundraising / notice banners.
+      - "#footer-info-lastmod"
+      - "#siteNotice"
+      # Mobile "related articles" strip: shows a different random set of
+      # article cards on every visit, so it must be masked or it always differs.
+      - ".read-more-container"
