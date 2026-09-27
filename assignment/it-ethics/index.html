@@ -6,23 +6,18 @@
   <title>จริยธรรมและจรรยาบรรณในการใช้เทคโนโลยีสารสนเทศ</title>
   <style>
     @font-face {
-      font-family: "Noto Sans Thai";
-      src: url("fonts/NotoSansThai-Regular.ttf") format("truetype");
+      font-family: "Sarabun";
+      src: url("fonts/Sarabun-Regular.ttf") format("truetype");
       font-weight: 400;
     }
     @font-face {
-      font-family: "Noto Sans Thai";
-      src: url("fonts/NotoSansThai-Bold.ttf") format("truetype");
-      font-weight: 700;
+      font-family: "Sarabun";
+      src: url("fonts/Sarabun-SemiBold.ttf") format("truetype");
+      font-weight: 600;
     }
     @font-face {
-      font-family: "Noto Serif Thai";
-      src: url("fonts/NotoSerifThai-Regular.ttf") format("truetype");
-      font-weight: 400;
-    }
-    @font-face {
-      font-family: "Noto Serif Thai";
-      src: url("fonts/NotoSerifThai-Bold.ttf") format("truetype");
+      font-family: "Sarabun";
+      src: url("fonts/Sarabun-Bold.ttf") format("truetype");
       font-weight: 700;
     }
 
@@ -42,7 +37,7 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { height: 100%; }
     body {
-      font-family: "Noto Sans Thai", "Noto Sans", sans-serif;
+      font-family: "Sarabun", "Noto Sans Thai", sans-serif;
       background: #0d1a28;
       color: var(--ink);
       overflow: hidden;
@@ -76,9 +71,7 @@
     }
 
     .kicker {
-      font-size: 18px;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
+      font-size: 20px;
       color: var(--gold);
       font-weight: 700;
       margin-bottom: 14px;
@@ -86,16 +79,16 @@
     .cover .kicker { color: #efc27a; }
 
     h1 {
-      font-family: "Noto Serif Thai", serif;
-      font-size: 54px;
-      line-height: 1.28;
-      max-width: 15ch;
+      font-family: "Sarabun", sans-serif;
+      font-size: 48px;
+      line-height: 1.45;
+      max-width: 14em;
       font-weight: 700;
     }
     h2 {
-      font-family: "Noto Serif Thai", serif;
-      font-size: 40px;
-      line-height: 1.35;
+      font-family: "Sarabun", sans-serif;
+      font-size: 36px;
+      line-height: 1.45;
       margin-bottom: 28px;
     }
     .subtitle {
@@ -206,10 +199,10 @@
 
     .close { font-size: 20px; line-height: 1.7; color: var(--muted); max-width: 48ch; }
     .quote {
-      font-family: "Noto Serif Thai", serif;
+      font-family: "Sarabun", sans-serif;
       font-size: 32px;
       line-height: 1.5;
-      max-width: 22ch;
+      max-width: 18em;
     }
   </style>
 </head>
@@ -222,7 +215,7 @@
       <h1>จริยธรรมและจรรยาบรรณ<br>ในการใช้เทคโนโลยีสารสนเทศ</h1>
       <p class="subtitle">พร้อมวิเคราะห์ข่าว 1 เรื่อง · AI Deepfake และ Voice Clone ปี 2569</p>
       <div class="footer-bar">
-        <span>กดลูกศรขวา หรือคลิก เพื่อไปสไลด์ถัดไป</span>
+        <span>งานนำเสนอสำหรับอัดคลิปส่งครู</span>
         <span>1 / 12</span>
       </div>
     </section>
@@ -460,8 +453,14 @@
       }
     });
     document.getElementById("deck").addEventListener("click", () => show(i + 1));
-    show(0);
-    if (new URLSearchParams(location.search).has("autoplay")) startAuto();
+    const params = new URLSearchParams(location.search);
+    const start = Number(params.get("slide") || 0);
+    show(Number.isFinite(start) ? start : 0);
+    if (params.has("autoplay")) startAuto();
+    if (params.has("slide") || params.has("record")) {
+      const hint = document.getElementById("hint");
+      if (hint) hint.style.display = "none";
+    }
   </script>
 </body>
 </html>
