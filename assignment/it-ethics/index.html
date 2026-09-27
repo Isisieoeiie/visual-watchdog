@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>จริยธรรมและจรรยาบรรณในการใช้เทคโนโลยีสารสนเทศ</title>
+  <style>
+    @font-face {
+      font-family: "Noto Sans Thai";
+      src: url("fonts/NotoSansThai-Regular.ttf") format("truetype");
+      font-weight: 400;
+    }
+    @font-face {
+      font-family: "Noto Sans Thai";
+      src: url("fonts/NotoSansThai-Bold.ttf") format("truetype");
+      font-weight: 700;
+    }
+    @font-face {
+      font-family: "Noto Serif Thai";
+      src: url("fonts/NotoSerifThai-Regular.ttf") format("truetype");
+      font-weight: 400;
+    }
+    @font-face {
+      font-family: "Noto Serif Thai";
+      src: url("fonts/NotoSerifThai-Bold.ttf") format("truetype");
+      font-weight: 700;
+    }
+
+    :root {
+      --ink: #122033;
+      --muted: #4d5b6b;
+      --paper: #f4efe6;
+      --card: #fffdf8;
+      --navy: #16324f;
+      --navy-2: #1f4e79;
+      --gold: #c9842a;
+      --clay: #b85c38;
+      --teal: #2a6f6a;
+      --line: #d9cfc0;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body {
+      font-family: "Noto Sans Thai", "Noto Sans", sans-serif;
+      background: #0d1a28;
+      color: var(--ink);
+      overflow: hidden;
+    }
+
+    .deck {
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+    }
+
+    .slide {
+      display: none;
+      width: 100%;
+      height: 100%;
+      padding: 56px 72px 72px;
+      background:
+        radial-gradient(1200px 500px at 100% -10%, rgba(201, 132, 42, 0.12), transparent 50%),
+        linear-gradient(180deg, #f7f2ea 0%, #efe6d8 100%);
+      position: relative;
+    }
+    .slide.active { display: flex; flex-direction: column; }
+
+    .slide.cover {
+      background:
+        radial-gradient(900px 480px at 85% 15%, rgba(201, 132, 42, 0.28), transparent 55%),
+        linear-gradient(145deg, #102033 0%, #1a3d5c 55%, #16324f 100%);
+      color: #f6efe3;
+      justify-content: flex-end;
+      padding-bottom: 88px;
+    }
+
+    .kicker {
+      font-size: 18px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 700;
+      margin-bottom: 14px;
+    }
+    .cover .kicker { color: #efc27a; }
+
+    h1 {
+      font-family: "Noto Serif Thai", serif;
+      font-size: 54px;
+      line-height: 1.28;
+      max-width: 15ch;
+      font-weight: 700;
+    }
+    h2 {
+      font-family: "Noto Serif Thai", serif;
+      font-size: 40px;
+      line-height: 1.35;
+      margin-bottom: 28px;
+    }
+    .subtitle {
+      margin-top: 22px;
+      font-size: 22px;
+      color: #d7c4a2;
+      max-width: 36ch;
+    }
+
+    .row { display: grid; gap: 20px; }
+    .row.two { grid-template-columns: 1fr 1fr; }
+    .row.three { grid-template-columns: 1fr 1fr 1fr; }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 22px 24px;
+      box-shadow: 0 10px 30px rgba(18, 32, 51, 0.05);
+    }
+    .card h3 {
+      font-size: 22px;
+      margin-bottom: 8px;
+      color: var(--navy);
+    }
+    .card p, .card li { color: var(--muted); font-size: 20px; line-height: 1.65; }
+    .card ul { padding-left: 22px; }
+    .card li + li { margin-top: 6px; }
+
+    .principles { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .principle {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 16px 18px;
+    }
+    .num {
+      min-width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--navy);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-weight: 700;
+      margin-top: 2px;
+    }
+    .principle strong { display: block; font-size: 20px; margin-bottom: 2px; }
+    .principle span { color: var(--muted); font-size: 18px; line-height: 1.5; }
+
+    .news-box {
+      background: #fff8ee;
+      border-left: 6px solid var(--clay);
+      padding: 20px 24px;
+      border-radius: 0 16px 16px 0;
+    }
+    .news-box .source { color: var(--clay); font-weight: 700; font-size: 16px; margin-bottom: 8px; }
+    .news-box p { font-size: 22px; line-height: 1.7; }
+
+    .pill {
+      display: inline-block;
+      background: #efe2cc;
+      color: #7a4b12;
+      border-radius: 999px;
+      padding: 4px 12px;
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .footer-bar {
+      position: absolute;
+      left: 72px;
+      right: 72px;
+      bottom: 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--muted);
+      font-size: 15px;
+    }
+    .cover .footer-bar { color: #cbbba0; }
+
+    .progress {
+      position: absolute;
+      left: 0; right: 0; top: 0;
+      height: 6px;
+      background: rgba(18, 32, 51, 0.08);
+    }
+    .progress > i {
+      display: block;
+      height: 100%;
+      background: linear-gradient(90deg, var(--gold), var(--clay));
+      width: 0;
+    }
+
+    .hint {
+      position: fixed;
+      right: 24px;
+      bottom: 20px;
+      color: #c9b79a;
+      font-size: 14px;
+      z-index: 5;
+    }
+
+    .close { font-size: 20px; line-height: 1.7; color: var(--muted); max-width: 48ch; }
+    .quote {
+      font-family: "Noto Serif Thai", serif;
+      font-size: 32px;
+      line-height: 1.5;
+      max-width: 22ch;
+    }
+  </style>
+</head>
+<body>
+  <div class="deck" id="deck">
+
+    <section class="slide cover" data-sec="18">
+      <div class="progress"><i></i></div>
+      <p class="kicker">งานนำเสนอ · เทคโนโลยีสารสนเทศ</p>
+      <h1>จริยธรรมและจรรยาบรรณ<br>ในการใช้เทคโนโลยีสารสนเทศ</h1>
+      <p class="subtitle">พร้อมวิเคราะห์ข่าว 1 เรื่อง · AI Deepfake และ Voice Clone ปี 2569</p>
+      <div class="footer-bar">
+        <span>กดลูกศรขวา หรือคลิก เพื่อไปสไลด์ถัดไป</span>
+        <span>1 / 12</span>
+      </div>
+    </section>
+
+    <section class="slide" data-sec="16">
+      <div class="progress"><i></i></div>
+      <p class="kicker">โครงเรื่อง</p>
+      <h2>วันนี้จะพูดอะไรบ้าง</h2>
+      <div class="row two">
+        <div class="card">
+          <h3>1–4 หลักคิด</h3>
+          <p>ความหมายของจริยธรรมและจรรยาบรรณ หลักการใช้เทคโนโลยีอย่างรับผิดชอบ และจรรยาบรรณวิชาชีพคอมพิวเตอร์</p>
+        </div>
+        <div class="card">
+          <h3>5–6 กฎหมายและข่าว</h3>
+          <p>กฎหมายที่เกี่ยวข้องโดยย่อ แล้ววิเคราะห์ข่าวจริงเรื่องมิจฉาชีพใช้ AI ปลอมเสียง–ใบหน้า เพื่อหลอกโอนเงิน</p>
+        </div>
+      </div>
+      <div class="footer-bar"><span>จริยธรรม · จรรยาบรรณ · ข่าว</span><span>2 / 12</span></div>
+    </section>
+
+    <section class="slide" data-sec="22">
+      <div class="progress"><i></i></div>
+      <p class="kicker">นิยาม</p>
+      <h2>จริยธรรม กับ จรรยาบรรณ ต่างกันอย่างไร</h2>
+      <div class="row two">
+        <div class="card">
+          <span class="pill">Ethics</span>
+          <h3>จริยธรรม</h3>
+          <p>หลักที่บอกว่าอะไรถูกอะไรผิด เป็นสิ่งที่สังคมยึดถือ แม้ไม่มีใครยืนบังคับ เช่น ไม่โกหก ไม่รังแก ไม่เอาข้อมูลคนอื่นไปใช้</p>
+        </div>
+        <div class="card">
+          <span class="pill">Code of conduct</span>
+          <h3>จรรยาบรรณ</h3>
+          <p>กฎความประพฤติของคนในวิชาชีพ เช่น โปรแกรมเมอร์ แอดมิน หรือนักเรียนคอมพิวเตอร์ ต้องรักษาความลับ ไม่สร้างโปรแกรมที่เป็นภัย</p>
+        </div>
+      </div>
+      <div class="footer-bar"><span>เทคโนโลยีไม่มีจริยธรรมในตัว · คนเป็นคนเลือกใช้</span><span>3 / 12</span></div>
+    </section>
+
+    <section class="slide" data-sec="28">
+      <div class="progress"><i></i></div>
+      <p class="kicker">หลักปฏิบัติ</p>
+      <h2>6 หลักจริยธรรมการใช้เทคโนโลยี</h2>
+      <div class="principles">
+        <div class="principle"><div class="num">1</div><div><strong>ไม่ทำร้ายผู้อื่น</strong><span>ไม่กลั่นแกล้งออนไลน์ ไม่ด่า ไม่แชร์คลิปที่ทำให้ใครอับอาย</span></div></div>
+        <div class="principle"><div class="num">2</div><div><strong>เคารพความเป็นส่วนตัว</strong><span>ไม่แอบดูไฟล์ ไม่แอบถ่าย ไม่เอาใบหน้าหรือเสียงคนอื่นไปใช้</span></div></div>
+        <div class="principle"><div class="num">3</div><div><strong>ไม่ขโมยผลงาน</strong><span>ไม่ก็อปปี้ซอฟต์แวร์ เพลง คลิป หรือการบ้านโดยไม่ได้รับอนุญาต</span></div></div>
+        <div class="principle"><div class="num">4</div><div><strong>ไม่เผยแพร่ข้อมูลเท็จ</strong><span>ตรวจก่อนแชร์ ไม่ส่งข่าวปลอม ไม่สร้างคลิปหลอก</span></div></div>
+        <div class="principle"><div class="num">5</div><div><strong>รับผิดชอบสิ่งที่โพสต์</strong><span>สิ่งที่ขึ้นอินเทอร์เน็ตลบยาก ต้องคิดก่อนกดส่ง</span></div></div>
+        <div class="principle"><div class="num">6</div><div><strong>คิดถึงสังคม</strong><span>ใช้ความรู้คอมพิวเตอร์เพื่อช่วยคน ไม่เอาเปรียบคนอื่น</span></div></div>
+      </div>
+      <div class="footer-bar"><span>ดัดแปลงจากหลัก Computer Ethics และหลักสูตรเทคโนโลยีสารสนเทศ</span><span>4 / 12</span></div>
+    </section>
+
+    <section class="slide" data-sec="22">
+      <div class="progress"><i></i></div>
+      <p class="kicker">วิชาชีพ</p>
+      <h2>จรรยาบรรณของผู้ใช้และผู้สร้างซอฟต์แวร์</h2>
+      <div class="row three">
+        <div class="card">
+          <h3>ยึดประโยชน์สาธารณะ</h3>
+          <p>ACM ระบุว่าประโยชน์ของสังคมมาก่อนผลประโยชน์ส่วนตัว อย่าสร้างระบบที่เอาเปรียบผู้ใช้</p>
+        </div>
+        <div class="card">
+          <h3>ซื่อสัตย์และรักษาความลับ</h3>
+          <p>ไม่เปิดเผยรหัส ข้อมูลนักเรียน หรือข้อมูลลูกค้า ไม่รับงานที่เกินความรู้แล้วยกให้คนอื่นทำเงียบ ๆ</p>
+        </div>
+        <div class="card">
+          <h3>ไม่สร้างเครื่องมือที่เป็นภัย</h3>
+          <p>ไม่เขียนมัลแวร์ ไม่ช่วยหลอกเงิน ไม่ใช้ AI ปลอมตัวตนของผู้อื่น</p>
+        </div>
+      </div>
+      <div class="footer-bar"><span>อ้างอิง ACM Code of Ethics and Professional Conduct (2018)</span><span>5 / 12</span></div>
+    </section>
+
+    <section class="slide" data-sec="20">
+      <div class="progress"><i></i></div>
+      <p class="kicker">เส้นสุดท้าย</p>
+      <h2>กฎหมายที่เกี่ยวข้องโดยย่อ</h2>
+      <div class="row two">
+        <div class="card">
+          <h3>พ.ร.บ. คอมพิวเตอร์ 2550 แก้ไข 2560</h3>
+          <ul>
+            <li>ห้ามนำเข้าข้อมูลเท็จที่ทำให้ผู้อื่นเสียหาย</li>
+            <li>มาตรา 16 ห้ามนำภาพคนอื่นไปตัดต่อหรือดัดแปลงจนเสียชื่อเสียง — ใช้กับ Deepfake ได้บางกรณี</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>พ.ร.บ. คุ้มครองข้อมูลส่วนบุคคล (PDPA)</h3>
+          <ul>
+            <li>ใบหน้าและเสียงเป็นข้อมูลส่วนบุคคล</li>
+            <li>เอาไปให้ AI เรียนรู้โดยไม่ได้รับความยินยอม อาจผิดกฎหมาย</li>
+            <li>ยังมีกฎหมายลิขสิทธิ์คุ้มครองผลงานของผู้อื่น</li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bar"><span>จริยธรรมอยู่ก่อนกฎหมาย · กฎหมายมาเมื่อมีคนละเมิด</span><span>6 / 12</span></div>
+    </section>
+
+    <section class="slide" data-sec="16">
+      <div class="progress"><i></i></div>
+      <p class="kicker">ข่าวประจำ</p>
+      <h2>มิจฉาชีพใช้ AI ปลอมเสียงคนในครอบครัว</h2>
+      <div class="news-box">
+        <p class="source">แหล่งข่าว · กระทรวงดิจิทัลเพื่อเศรษฐกิจและสังคม / AOC 1441 · 9 กุมภาพันธ์ 2569</p>
+        <p>ดีอีเตือนประชาชนว่าขณะนี้มิจฉาชีพใช้ <strong>AI Deepfake</strong> และ <strong>Voice Clone</strong> เลียนแบบเสียงพ่อ แม่ ลูก หลาน คนรัก หรือเจ้าหน้าที่รัฐ จนแทบแยกไม่ออก แล้วสร้างเรื่องเร่งด่วนให้เหยื่อโอนเงินทันที</p>
+      </div>
+      <div class="footer-bar"><span>ข่าวจริงที่นำมาวิเคราะห์ในคลิปนี้</span><span>7 / 12</span></div>
+    </section>
+
+    <section class="slide" data-sec="26">
+      <div class="progress"><i></i></div>
+      <p class="kicker">รายละเอียดข่าว</p>
+      <h2>เกิดอะไรขึ้น และเสียหายแค่ไหน</h2>
+      <div class="row two">
+        <div class="card">
+          <h3>กรณีตัวอย่างจาก AOC 1441</h3>
+          <p>ผู้เสียหายได้รับสายจากคนที่อ้างว่าเป็น “ลูกสาว” ที่เรียนมหาวิทยาลัย ขอให้โอนเงินเป็นค่ากิจกรรม เสียงเหมือนลูกสาวจริง จึงโอนไปกว่า <strong>100,000 บาท</strong> ภายหลังโทรถามลูกสาวตัวจริง จึงรู้ว่าไม่เคยมีเรื่องนั้น — เสียงถูกปลอมด้วย AI</p>
+        </div>
+        <div class="card">
+          <h3>สถานการณ์ปี 2568–2569</h3>
+          <ul>
+            <li>Thai PBS Verify: ปี 2568 พบการใช้ AI ปลอมเสียงหลายเดือนแล้ว</li>
+            <li>คนร้ายมักบอกให้ลบเบอร์เก่า แล้วโทรกลับมาขอยืมเงิน</li>
+            <li>สภาผู้บริโภค 24 พ.ย. 2568: คนดังถูกปลอมหน้าไปชวนเล่นพนันออนไลน์</li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bar"><span>อ้างอิง Thai PBS Verify และสภาองค์กรของผู้บริโภค</span><span>8 / 12</span></div>
+    </section>
+
+    <section class="slide" data-sec="22">
+      <div class="progress"><i></i></div>
+      <p class="kicker">วิเคราะห์ข่าว</p>
+      <h2>ข่าวนี้ผิดหลักจริยธรรมข้อใด</h2>
+      <div class="principles">
+        <div class="principle"><div class="num">!</div><div><strong>ไม่ซื่อสัตย์</strong><span>แอบอ้างเป็นคนในครอบครัวเพื่อหลอกเอาเงิน</span></div></div>
+        <div class="principle"><div class="num">!</div><div><strong>ละเมิดความเป็นส่วนตัว</strong><span>เอาเสียงและใบหน้าของผู้อื่นไปให้ AI เรียนรู้โดยไม่ได้รับอนุญาต</span></div></div>
+        <div class="principle"><div class="num">!</div><div><strong>ใช้เทคโนโลยีทำร้ายสังคม</strong><span>ความรู้ด้าน AI ถูกใช้ทำลายความไว้ใจในครอบครัว</span></div></div>
+        <div class="principle"><div class="num">!</div><div><strong>ผู้ใช้ก็มีจรรยาบรรณ</strong><span>ไม่แชร์คลิปที่ยังไม่ตรวจ และไม่โพสต์รูปหน้าตรงชัด ๆ ให้เป็นวัตถุดิบของ AI</span></div></div>
+      </div>
+      <div class="footer-bar"><span>ข่าวนี้เชื่อมโยงทั้งจริยธรรม จรรยาบรรณ และกฎหมาย</span><span>9 / 12</span></div>
+    </section>
+
+    <section class="slide" data-sec="22">
+      <div class="progress"><i></i></div>
+      <p class="kicker">นำไปใช้</p>
+      <h2>นักเรียนทำอะไรได้ตั้งแต่วันนี้</h2>
+      <div class="row two">
+        <div class="card">
+          <h3>ป้องกันตัวเองและครอบครัว</h3>
+          <ul>
+            <li>ตั้งรหัสลับเฉพาะในบ้าน ถ้าสายแปลกขอยืมเงิน ให้ถามรหัสนี้</li>
+            <li>ถ้าเบอร์ไม่คุ้น แม้เสียงจะเหมือนคนรู้จัก ให้วางสาย แล้วโทรกลับเบอร์เดิม</li>
+            <li>ยึดหลักของดีอี: <strong>ไม่กดลิงก์ ไม่เชื่อ ไม่รีบ ไม่โอน</strong></li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>ใช้เทคโนโลยีอย่างมีจรรยาบรรณ</h3>
+          <ul>
+            <li>ไม่เอาหน้าหรือเสียงเพื่อนไปทำคลิปตลกโดยไม่ขออนุญาต</li>
+            <li>ตรวจแหล่งข่าวก่อนแชร์</li>
+            <li>ถ้าถูกหลอกหรือเจอข่าวปลอม โทร <strong>AOC 1441</strong> หรือสายด่วน 1111</li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bar"><span>สติสำคัญกว่าเทคโนโลยี</span><span>10 / 12</span></div>
+    </section>
+
+    <section class="slide" data-sec="18">
+      <div class="progress"><i></i></div>
+      <p class="kicker">สรุป</p>
+      <h2 class="quote">เทคโนโลยีไม่มีจริยธรรมในตัว คนเป็นคนเลือกใช้</h2>
+      <p class="close" style="margin-top:28px">จริยธรรมบอกว่าอะไรถูกอะไรผิด จรรยาบรรณบอกว่าคนในวิชาชีพควรทำอย่างไร และกฎหมายคือเส้นสุดท้ายเมื่อมีคนละเมิด ข่าว Deepfake สอนเราว่าความรู้คอมพิวเตอร์ถ้าไม่มีคุณธรรม จะกลายเป็นอาวุธได้ทันที</p>
+      <div class="footer-bar"><span>ขอบคุณที่รับฟัง</span><span>11 / 12</span></div>
+    </section>
+
+    <section class="slide" data-sec="14">
+      <div class="progress"><i></i></div>
+      <p class="kicker">อ้างอิง</p>
+      <h2>แหล่งข้อมูลที่ใช้ในคลิปนี้</h2>
+      <div class="card">
+        <ul>
+          <li>กระทรวงดิจิทัลเพื่อเศรษฐกิจและสังคม / AOC 1441, 9 ก.พ. 2569 — เตือนภัย AI Deepfake หลอกโอนเงิน</li>
+          <li>Thai PBS Verify — “AI Clone &amp; Deepfake ระวังมุกใหม่ ปี 69”</li>
+          <li>สภาองค์กรของผู้บริโภค, 24 พ.ย. 2568 — คนดังถูกปลอมหน้าชวนเล่นพนัน</li>
+          <li>ACM Code of Ethics and Professional Conduct (2018)</li>
+          <li>พ.ร.บ. ว่าด้วยการกระทำความผิดเกี่ยวกับคอมพิวเตอร์ พ.ศ. 2550 แก้ไข 2560 และ PDPA พ.ศ. 2562</li>
+        </ul>
+      </div>
+      <div class="footer-bar"><span>จบการนำเสนอ</span><span>12 / 12</span></div>
+    </section>
+  </div>
+  <p class="hint" id="hint">← → หรือคลิก · กด A เพื่อเล่นอัตโนมัติ</p>
+  <script>
+    const slides = [...document.querySelectorAll(".slide")];
+    let i = 0;
+    let timer = null;
+
+    function show(n) {
+      i = (n + slides.length) % slides.length;
+      slides.forEach((s, idx) => s.classList.toggle("active", idx === i));
+      const pct = ((i + 1) / slides.length) * 100;
+      slides[i].querySelector(".progress i").style.width = pct + "%";
+      if (timer) {
+        clearTimeout(timer);
+        const sec = Number(slides[i].dataset.sec || 16);
+        timer = setTimeout(() => {
+          if (i < slides.length - 1) show(i + 1);
+        }, sec * 1000);
+      }
+    }
+
+    function startAuto() {
+      if (timer) return;
+      document.getElementById("hint").textContent = "กำลังเล่นอัตโนมัติ";
+      const sec = Number(slides[i].dataset.sec || 16);
+      timer = setTimeout(() => {
+        if (i < slides.length - 1) show(i + 1);
+      }, sec * 1000);
+    }
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowRight" || e.key === " " || e.key === "PageDown") {
+        e.preventDefault();
+        show(i + 1);
+      } else if (e.key === "ArrowLeft" || e.key === "PageUp") {
+        e.preventDefault();
+        show(i - 1);
+      } else if (e.key === "a" || e.key === "A") {
+        startAuto();
+      } else if (e.key === "Home") {
+        show(0);
+      }
+    });
+    document.getElementById("deck").addEventListener("click", () => show(i + 1));
+    show(0);
+    if (new URLSearchParams(location.search).has("autoplay")) startAuto();
+  </script>
+</body>
+</html>
